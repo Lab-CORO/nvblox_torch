@@ -95,7 +95,7 @@ std::vector<double> layer_parameters)
   mappers_.push_back(mapper);
 }
 
-void Mapper::integrateDepth(torch::Tensor depth_frame_t, torch::Tensor T_L_C_t, torch::Tensor intrinsics_t, long mapper_id)
+void Mapper::integrateDepth(torch::Tensor depth_frame_t, torch::Tensor T_L_C_t, torch::Tensor intrinsics_t, int64_t mapper_id)
 {
   auto mapper = mappers_[mapper_id];
 
@@ -109,7 +109,7 @@ void Mapper::integrateDepth(torch::Tensor depth_frame_t, torch::Tensor T_L_C_t, 
   mapper->integrateDepth(depth_frame, T_L_C, camera);
 }
 
-void Mapper::integrateColor(torch::Tensor color_frame_t, torch::Tensor T_L_C_t, torch::Tensor intrinsics_t, long mapper_id)
+void Mapper::integrateColor(torch::Tensor color_frame_t, torch::Tensor T_L_C_t, torch::Tensor intrinsics_t, int64_t mapper_id)
 {
   auto mapper = mappers_[mapper_id];
 
@@ -122,7 +122,7 @@ void Mapper::integrateColor(torch::Tensor color_frame_t, torch::Tensor T_L_C_t, 
   mapper->integrateColor(color_frame, T_L_C, camera);
 }
 
-void Mapper::updateEsdf(long mapper_id)
+void Mapper::updateEsdf(int64_t mapper_id)
 {
   if (mapper_id >= 0) {
     mappers_[mapper_id]->updateEsdf();
@@ -135,7 +135,7 @@ void Mapper::updateEsdf(long mapper_id)
   hash_update_ = false;
 }
 
-void Mapper::updateMesh(long mapper_id) {
+void Mapper::updateMesh(int64_t mapper_id) {
   if (mapper_id >= 0) {
     mappers_[mapper_id]->updateMesh();
   }
@@ -148,7 +148,7 @@ void Mapper::updateMesh(long mapper_id) {
 
 }
 
-void Mapper::fullUpdate(torch::Tensor depth_frame_t, torch::Tensor color_frame_t, torch::Tensor T_L_C_t, torch::Tensor intrinsics_t, long mapper_id) {
+void Mapper::fullUpdate(torch::Tensor depth_frame_t, torch::Tensor color_frame_t, torch::Tensor T_L_C_t, torch::Tensor intrinsics_t, int64_t mapper_id) {
   auto mapper = mappers_[mapper_id];
 
   int height = depth_frame_t.sizes()[0];
@@ -166,7 +166,7 @@ void Mapper::fullUpdate(torch::Tensor depth_frame_t, torch::Tensor color_frame_t
   mapper->updateMesh();
 }
 
-void Mapper::decayOccupancy(long mapper_id) {
+void Mapper::decayOccupancy(int64_t mapper_id) {
   if (mapper_id >= 0) {
     mappers_[mapper_id]->decayOccupancy();
     mappers_[mapper_id]->decayTsdf();
@@ -181,7 +181,7 @@ void Mapper::decayOccupancy(long mapper_id) {
   }
 }
 
-void Mapper::clear(long mapper_id) {
+void Mapper::clear(int64_t mapper_id) {
   if (mapper_id >= 0) {
     mappers_[mapper_id]->occupancy_layer().clear();
     mappers_[mapper_id]->tsdf_layer().clear();
@@ -209,7 +209,7 @@ torch::Tensor Mapper::renderDepthImage(
   int64_t img_width,
   double max_ray_length,
   int64_t max_steps,
-  long mapper_id)
+  int64_t mapper_id)
 {
   auto mapper = mappers_[mapper_id];
 
@@ -244,7 +244,7 @@ std::vector<torch::Tensor> Mapper::renderDepthAndColorImage(
   int64_t img_width,
   double max_ray_length,
   int64_t max_steps,
-  long mapper_id)
+  int64_t mapper_id)
 {
   auto mapper = mappers_[mapper_id];
   // TODO: This 4.0 is the default truncation distance in projective_integrator_base.h
@@ -297,7 +297,7 @@ __global__ void isBlockOccupied(int num_blocks,
 }*/
 
 
-torch::Tensor Mapper::getAllOccupiedVoxels(long mapper_id) {
+torch::Tensor Mapper::getAllOccupiedVoxels(int64_t mapper_id) {
   auto mapper = mappers_[mapper_id];
   auto mapper_type = projective_layer_type_[mapper_id];
   int num_voxels = 1;
@@ -357,12 +357,12 @@ void Mapper::initHashMaps()
   num_layers = num_mappers;
 }
 
-bool Mapper::outputMeshPly(std::string mesh_output_path, long mapper_id) {
+bool Mapper::outputMeshPly(std::string mesh_output_path, int64_t mapper_id) {
   auto mapper = mappers_[mapper_id];
   return nvblox::io::outputMeshLayerToPly(mapper->mesh_layer(), mesh_output_path.c_str());
 }
 
-bool Mapper::outputBloxMap(std::string blox_output_path, long mapper_id)
+bool Mapper::outputBloxMap(std::string blox_output_path, int64_t mapper_id)
 {
   auto mapper = mappers_[mapper_id];
   const bool result =  mapper->saveLayerCake(blox_output_path);
@@ -370,7 +370,7 @@ bool Mapper::outputBloxMap(std::string blox_output_path, long mapper_id)
 }
 
 
-std::vector<torch::Tensor> Mapper::getMesh(long mapper_id)
+std::vector<torch::Tensor> Mapper::getMesh(int64_t mapper_id)
 {
   auto mapper = mappers_[mapper_id];
 
@@ -435,7 +435,7 @@ std::vector<torch::Tensor> Mapper::getMesh(long mapper_id)
 }
 
 
-void Mapper::buildFromScene(c10::intrusive_ptr<Scene> scene, long mapper_id) {
+void Mapper::buildFromScene(c10::intrusive_ptr<Scene> scene, int64_t mapper_id) {
   auto mapper = mappers_[mapper_id];
   float voxel_size = voxel_size_m_[mapper_id];
 
@@ -573,7 +573,7 @@ std::vector<torch::Tensor> Mapper::querySdf(
 		const torch::Tensor sphere_position_rad,
 		const int64_t batch_size,
 		const bool write_closest_point,
-    long mapper_id) {
+    int64_t mapper_id) {
   // TODO: Edit this to query all the mappers
   auto mapper = mappers_[mapper_id];
 
@@ -871,7 +871,7 @@ std::vector<torch::Tensor> Mapper::querySphereTrajectorySdfMultiCost(
 
 
 
-void Mapper::loadFromFile(std::string file_path, long mapper_id)
+void Mapper::loadFromFile(std::string file_path, int64_t mapper_id)
 {
 	// TODO: How to load?
   //mapper_.reset(new RgbdMapper(file_path, MemoryType::kDevice));

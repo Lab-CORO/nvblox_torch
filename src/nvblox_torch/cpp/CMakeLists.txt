@@ -33,15 +33,11 @@ find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(glog REQUIRED libglog)
+# Find glog and gflags via cmake config before nvblox (nvbloxTargets.cmake requires them)
+find_package(glog REQUIRED)
+find_package(gflags REQUIRED)
 # Download thirdparty deps
-#message(STATUS "Downloading 3rdparty dependencies")
-#message(STATUS "Downloading Eigen")
 include(thirdparty/eigen/eigen.cmake)
-#find_package(Glog REQUIRED)
-
-#find_package(Eigen3 REQUIRED) # we need to import eigen from nvblox?
-
 
 find_package(CUDA REQUIRED)
 

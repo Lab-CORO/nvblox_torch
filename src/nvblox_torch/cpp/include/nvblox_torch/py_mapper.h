@@ -63,19 +63,19 @@ struct Mapper : torch::CustomClassHolder {
   void initHashMaps();
   void updateHashMaps();
 
-  void integrateDepth(torch::Tensor depth_frame_t, torch::Tensor T_L_C_t, torch::Tensor intrinsics_t, long mapper_id=-1);
+  void integrateDepth(torch::Tensor depth_frame_t, torch::Tensor T_L_C_t, torch::Tensor intrinsics_t, int64_t mapper_id=-1);
 
-  void integrateColor(torch::Tensor color_frame_t, torch::Tensor T_L_C_t, torch::Tensor intrinsics_t, long mapper_id=-1);
+  void integrateColor(torch::Tensor color_frame_t, torch::Tensor T_L_C_t, torch::Tensor intrinsics_t, int64_t mapper_id=-1);
 
-  void updateEsdf(long mapper_id=-1);
+  void updateEsdf(int64_t mapper_id=-1);
 
-  void updateMesh(long mapper_id=-1);
+  void updateMesh(int64_t mapper_id=-1);
 
-  void fullUpdate(torch::Tensor depth_frame_t, torch::Tensor color_frame_t, torch::Tensor T_L_C_t, torch::Tensor intrinsics_t, long mapper_id);
+  void fullUpdate(torch::Tensor depth_frame_t, torch::Tensor color_frame_t, torch::Tensor T_L_C_t, torch::Tensor intrinsics_t, int64_t mapper_id);
 
-  void decayOccupancy(long mapper_id=-1);
+  void decayOccupancy(int64_t mapper_id=-1);
 
-  void clear(long mapper_id=-1);
+  void clear(int64_t mapper_id=-1);
 
   void addMapper(double voxel_size_m, std::string projective_layer_type, std::vector<double> layer_parameters = {1.0f});
 
@@ -86,7 +86,7 @@ struct Mapper : torch::CustomClassHolder {
     int64_t img_width,
     double max_ray_length,
     int64_t max_steps,
-    long mapper_id);
+    int64_t mapper_id);
 
   std::vector<torch::Tensor> renderDepthAndColorImage(
     torch::Tensor camera_pose, 
@@ -95,16 +95,16 @@ struct Mapper : torch::CustomClassHolder {
     int64_t img_width,
     double max_ray_length,
     int64_t max_steps,
-    long mapper_id);
+    int64_t mapper_id);
 
-  torch::Tensor getAllOccupiedVoxels(long mapper_id);
+  torch::Tensor getAllOccupiedVoxels(int64_t mapper_id);
 
   std::vector<torch::Tensor> querySdf(
     torch::Tensor closest_point,
     const torch::Tensor sphere_position_rad,
     const int64_t batch_size,
     const bool write_closest_point,
-    long mapper_id=-1);
+    int64_t mapper_id=-1);
 
   std::vector<torch::Tensor> queryMultiSdf(
     torch::Tensor closest_point,
@@ -150,13 +150,13 @@ struct Mapper : torch::CustomClassHolder {
     const int64_t n_spheres, const int64_t sweep_steps, const bool enable_speed_metric, const bool write_grad,
     const bool use_experimental);
   
-  bool outputMeshPly(std::string mesh_output_path, long mapper_id=0);
-  bool outputBloxMap(std::string blox_output_path, long mapper_id=0);
+  bool outputMeshPly(std::string mesh_output_path, int64_t mapper_id=0);
+  bool outputBloxMap(std::string blox_output_path, int64_t mapper_id=0);
 
-  std::vector<torch::Tensor> getMesh(long mapper_id=0);
-  void loadFromFile(std::string file_path, long mapper_id=0);
+  std::vector<torch::Tensor> getMesh(int64_t mapper_id=0);
+  void loadFromFile(std::string file_path, int64_t mapper_id=0);
 
-  void buildFromScene(c10::intrusive_ptr<Scene> scene, long mapper_id=0);
+  void buildFromScene(c10::intrusive_ptr<Scene> scene, int64_t mapper_id=0);
 
   c10::intrusive_ptr<Mapper> clone() const {
     return c10::make_intrusive<Mapper>(voxel_size_m_, projective_layer_type_, layer_parameters_,free_on_destruct_);
